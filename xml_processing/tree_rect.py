@@ -1,6 +1,7 @@
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 import cv2
 
@@ -26,12 +27,12 @@ def get_mbr(points):
 
 def check_inside(x1,y1,x2,y2,polygon):
     if inside_poly(x1,x2,y1,y2,polygon) is True:
-        points.append([(x1,y1),(x2,y2)])
+        points.append([(math.floor(x1),math.floor(y1)),(math.floor(x2),math.floor(y2))])
         return
     else:
         width = abs(x2-x1)
         height = abs(y2-y1)
-        if width > 0.05 and height > 0.05:
+        if width > 25 and height > 25:
             mid_x,mid_y = (x1+x2)/2,(y1+y2)/2
             check_inside(x1,y1,mid_x,mid_y,polygon)
             check_inside(mid_x,y1,x2,mid_y,polygon)
@@ -40,23 +41,11 @@ def check_inside(x1,y1,x2,y2,polygon):
         else:
             return
 
-height,width = 800,800
-image = np.zeros((height,width,3), np.uint8)
 
-# test_polygon = [(0,0),(1,0),(1,1)]
-test_polygon = [(0.2,0.1),(0.6,0.2),(0.8,0.5),(0.5,0.7),(0.1,0.5)]
-polygon_draw = np.array(normalize(test_polygon,800),dtype=np.int32)
-# polygon_draw = np.array([(160,  80),(480, 160),(640, 400),(400, 560),(80, 400)])
-cv2.polylines(image,[polygon_draw],1,(255,255,0),1)
+def make_trees(polygon):
+    x1,y1,x2,y2 = get_mbr(polygon)
+    check_inside(x1,y1,x2,y2,polygon)
 
-x1,y1,x2,y2 = get_mbr(test_polygon)
-check_inside(x1,y1,x2,y2,test_polygon)
-
-norm_points = np.int_(normalize(points,800))
-
-for x in norm_points:
-    cv2.rectangle(image,(x[0][0],x[0][1]),(x[1][0],x[1][1]),(255,0,255),2)
+    return points
 
 
-cv2.imshow('test',image)
-cv2.waitKey(0)
