@@ -22,7 +22,7 @@ points = []
 
 def get_mbr(points):
     x_coordinates, y_coordinates = zip(*points)
-    return [(min(x_coordinates), min(y_coordinates)), (max(x_coordinates), max(y_coordinates))]
+    return min(x_coordinates), min(y_coordinates), max(x_coordinates), max(y_coordinates)
 
 def check_inside(x1,y1,x2,y2,polygon):
     if inside_poly(x1,x2,y1,y2,polygon) is True:
@@ -40,21 +40,22 @@ def check_inside(x1,y1,x2,y2,polygon):
         else:
             return
 
-image = np.ones((800, 800)) * 0
+height,width = 800,800
+image = np.zeros((height,width,3), np.uint8)
 
 # test_polygon = [(0,0),(1,0),(1,1)]
 test_polygon = [(0.2,0.1),(0.6,0.2),(0.8,0.5),(0.5,0.7),(0.1,0.5)]
-# polygon_draw = np.array(normalize(test_polygon,800),dtype=np.int32)
-polygon_draw = np.array([(160,  80),(480, 160),(640, 400),(400, 560),(80, 400)])
+polygon_draw = np.array(normalize(test_polygon,800),dtype=np.int32)
+# polygon_draw = np.array([(160,  80),(480, 160),(640, 400),(400, 560),(80, 400)])
 cv2.polylines(image,[polygon_draw],1,(255,255,0),1)
 
-mbr = get_mbr(test_polygon)
-check_inside(0,1,1,0,test_polygon)
+x1,y1,x2,y2 = get_mbr(test_polygon)
+check_inside(x1,y1,x2,y2,test_polygon)
 
 norm_points = np.int_(normalize(points,800))
 
 for x in norm_points:
-    cv2.rectangle(image,(x[0][0],x[0][1]),(x[1][0],x[1][1]),255,2)
+    cv2.rectangle(image,(x[0][0],x[0][1]),(x[1][0],x[1][1]),(255,0,255),2)
 
 
 cv2.imshow('test',image)
