@@ -1,0 +1,8 @@
+path: ../dataset  # dataset root dir
+train: ../dataset/train  # train images (relative to 'path') 128 images
+val: ../dataset/validate  # val images (relative to 'path') 128 images
+test:  # test images (optional)
+
+# Classes
+nc: 1  # number of classes
+names: [ 'building' ]  # class names
