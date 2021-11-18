@@ -1,5 +1,9 @@
 dataset/
 yolov5/
+coco_dataset/
+*.jpg
+*.txt
+*.xml
 *.tif
 *.zip
 # Byte-compiled / optimized / DLL files

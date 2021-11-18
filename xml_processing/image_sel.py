@@ -9,15 +9,11 @@ from matplotlib.pyplot import contour
 import numpy as np
 import tree_rect
 
-image = cv2.imread('color_ortho_6_3_.jpg')
-height,width,_ = image.shape
-downscaled = cv2.resize(image,(width//2,height//2))
 
 
 poly_list = []
 temp_poly = []
-loc_data = {}
-
+downscaled = 0
 
 
 
@@ -81,24 +77,42 @@ def draw_rectangle_with_drag(event, x, y, flags, param):
         cv2.polylines(downscaled,[np_poly],1,(255,0,255),1)
         temp_poly = []
 
-
-          
-cv2.namedWindow(winname = "Downscaled Orthomosaic")
-cv2.setMouseCallback("Downscaled Orthomosaic", 
-                     draw_rectangle_with_drag)
-
-while True:
-    cv2.imshow("Downscaled Orthomosaic", downscaled)
-    if cv2.waitKey(10) == 27:
-        shape_small = (height//2,width//2)
-        for polys in range(0,len(poly_list)):
-            poly_list[polys] = reversenomarlize(normalizebb(poly_list[polys],shape_small),shape_small)
+def draw_rects(image,rectangles):
+    # print(len(rectangles))
+    for x in rectangles:
+        cv2.rectangle(image,(x[0][0],x[0][1]),(x[1][0],x[1][1]),(0,0,255),1)
 
 
-        for x in poly_list:
-            rect_list = tree_rect.make_trees(x)
+
+def image_sel_method(image_name):
+    global downscaled
+    image = cv2.imread(image_name)
+    image_copy = image
+    height,width,_ = image.shape
+    downscaled = cv2.resize(image,(width//2,height//2))
+    scaled_polys = []
+    cv2.namedWindow(winname = "Downscaled Orthomosaic")
+    cv2.setMouseCallback("Downscaled Orthomosaic", 
+                        draw_rectangle_with_drag)
+    while True:
+        cv2.imshow("Downscaled Orthomosaic", downscaled)
+        if cv2.waitKey(10) == 27:
+            shape_small = (height//2,width//2)
+            for polys in range(0,len(poly_list)):
+                scaled_polys.append(reversenomarlize(normalizebb(poly_list[polys],shape_small),(height,width)))
+
+            del poly_list[:]
+            rect_list = []
+            for x in scaled_polys:
+                rect_list.append(tree_rect.make_trees(x))
             
+            # del final_poly[:]
+            # for rects in rect_list:
+            #     draw_rects(image_copy,rects)
 
-        break
-  
-cv2.destroyAllWindows()
+            # cv2.imshow('tet',image)
+            # cv2.waitKey(0)
+            break
+    
+    cv2.destroyAllWindows()
+    return rect_list

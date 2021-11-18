@@ -19,33 +19,33 @@ def inside_poly(x1,x2,y1,y2,poly):
     polygon = Polygon(poly)
     return (polygon.contains(tl) and polygon.contains(tr) and polygon.contains(bl) and polygon.contains(br))
 
-points = []
+# points = []
 
 def get_mbr(points):
     x_coordinates, y_coordinates = zip(*points)
     return min(x_coordinates), min(y_coordinates), max(x_coordinates), max(y_coordinates)
 
-def check_inside(x1,y1,x2,y2,polygon):
+def check_inside(x1,y1,x2,y2,polygon,points):
     if inside_poly(x1,x2,y1,y2,polygon) is True:
         points.append([(math.floor(x1),math.floor(y1)),(math.floor(x2),math.floor(y2))])
         return
     else:
         width = abs(x2-x1)
         height = abs(y2-y1)
-        if width > 25 and height > 25:
+        if width > 100 and height > 100:
             mid_x,mid_y = (x1+x2)/2,(y1+y2)/2
-            check_inside(x1,y1,mid_x,mid_y,polygon)
-            check_inside(mid_x,y1,x2,mid_y,polygon)
-            check_inside(x1,mid_y,mid_x,y2,polygon)
-            check_inside(mid_x,mid_y,x2,y2,polygon)
+            check_inside(x1,y1,mid_x,mid_y,polygon,points)
+            check_inside(mid_x,y1,x2,mid_y,polygon,points)
+            check_inside(x1,mid_y,mid_x,y2,polygon,points)
+            check_inside(mid_x,mid_y,x2,y2,polygon,points)
         else:
             return
 
 
 def make_trees(polygon):
     x1,y1,x2,y2 = get_mbr(polygon)
-    check_inside(x1,y1,x2,y2,polygon)
-
+    points = []
+    check_inside(x1,y1,x2,y2,polygon,points)
     return points
 
 
