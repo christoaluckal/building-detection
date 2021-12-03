@@ -50,14 +50,21 @@ def YoloFormat(file_xml,input_dir,output_dir):
     xmaxs = root.findall('object/bndbox/xmax')
     ymins = root.findall('object/bndbox/ymin')
     ymaxs = root.findall('object/bndbox/ymax')
-    for a,b,c,d in zip(ymins,xmins,ymaxs,xmaxs):
+    names = root.findall('object/name')
+    for a,b,c,d,name in zip(ymins,xmins,ymaxs,xmaxs,names):
         y_min,x_min,y_max,x_max = int(a.text),int(b.text),int(c.text),int(d.text)
         cent_x = (x_min+x_max)/(2*width)
         cent_y = (y_min+y_max)/(2*height)
         yolo_height = (y_max-y_min)/height
         yolo_width = (x_max-x_min)/width
-        with open('./dataset/'+file_xml[:-3]+"txt",'a') as writer:
-            writer.write("0 "+str(cent_x)+" "+str(cent_y)+" "+str(yolo_width)+" "+str(yolo_height)+"\n")
+        with open(input_dir+file_xml[:-3]+"txt",'a') as writer:
+            if name.text == 'building':
+                writer.write("0 "+str(cent_x)+" "+str(cent_y)+" "+str(yolo_width)+" "+str(yolo_height)+"\n")
+            else:
+                writer.write("1 "+str(cent_x)+" "+str(cent_y)+" "+str(yolo_width)+" "+str(yolo_height)+"\n")
+
+        # print("DONE")
+
 
 import sys
 import os
